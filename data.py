@@ -1,21 +1,43 @@
-import numpy as np
-import random
+from sklearn.datasets import load_breast_cancer
+data = load_breast_cancer()
+print(data)
 
-def generate_linear_data(n=100):
-    X = np.random.randn(n,2)
-    y=(X[:,0] + X[:,1]>0).astype(int)
-    return X,y
+import pandas as pd
+from sklearn.datasets import load_breast_cancer
 
-def generate_nonlinear_data(n=100, noise=0.1):
-    radius = np.random.rand(n)
-    angle = 2 * np.pi * np.random.rand(n)
 
-    x1 = radius * np.cos(angle)
-    x2 = radius * np.sin(angle)
+def load_data():
 
-    x = np.column_stack((x1, x2))
-    y= (radius > 0.5).astype(int)
+    # Load the breast cancer dataset
+    data = load_breast_cancer()
 
-    x += noise * np.random.randn(n,2)
-    return x,y
+    # Create feature matrix
+    X = pd.DataFrame(
+        data.data,
+        columns=data.feature_names
+    )
 
+    # Original sklearn:
+    # 0 = malignant
+    # 1 = benign
+    #
+    # We convert it to:
+    # 0 = benign
+    # 1 = malignant
+
+    y = pd.Series(
+        (data.target == 0).astype(int),
+        name="malignant"
+    )
+
+    return X, y, data
+
+
+if __name__ == "__main__":
+
+    X, y, data = load_data()
+
+    print(y.value_counts())
+    print("Feature matrix shape", X.shape)
+    print("Target shape", y.shape)
+    print("Class names", data.target_names)
